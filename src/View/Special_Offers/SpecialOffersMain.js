@@ -3,12 +3,13 @@ import axios from 'axios';
 import { Table, Divider, Tag } from 'antd';
 import { Drawer, Form, Button, Col, Row, Input, Select,Upload, message, DatePicker, Icon,Popconfirm } from 'antd';
 import { log } from 'util';
+import Axios from 'axios';
 
 const { Option } = Select;
 
 
 
-const url="http://localhost:5000/";
+const url="http://78.40.109.172:5000/";
 
 
 export class SpecialOffersMain extends Component {
@@ -19,6 +20,7 @@ export class SpecialOffersMain extends Component {
         text:"",
         visibleUpdate:false,
         file:"",
+        id:"",
         title_update:"",
         text_update:"",
         file_update:""
@@ -64,6 +66,22 @@ export class SpecialOffersMain extends Component {
     componentWillMount(){
         this.refresh();
     }
+    handleUpdate=()=>{
+        var {title_update,text_update,file_update,id}=this.state;
+        var data=new FormData();
+        if (file_update[0]) {
+            data.append('file',file_update[0]);
+        }
+        data.append('text',text_update);
+        data.append('title',title_update);
+        data.append('id',id)
+        Axios.post(url+"special_offers/update",data).then(res=>{
+            console.log(res);
+            this.refresh();
+            message.success('Успешно сделано');
+            this.setState({visible:false});
+        }).catch(err=>{console.log(err);message.error('Произошла ошибка!')});
+    };
     
     render() {
           const columns=[
@@ -78,7 +96,7 @@ export class SpecialOffersMain extends Component {
                 key:"title",
                 render: (text, record) => (
                     <span>
-                        <a onClick={()=>{window.open('http://localhost:3000/offers/'+record.id)}}>{text}</a> 
+                        <a>{text}</a> 
                     </span>
                   ),
             },{
@@ -91,7 +109,7 @@ export class SpecialOffersMain extends Component {
                 key: 'action',
                 render: (text, record) => (
                   <span>
-                    <a onClick={()=>{this.setState({visibleUpdate:true,title_update:record.title,text_update:record.text})}}>Изменить</a>
+                    <a onClick={()=>{this.setState({visibleUpdate:true,title_update:record.title,text_update:record.text,id:record.id})}}>Изменить</a>
                     <Divider type="vertical" />
                     <Popconfirm
                             title="Вы уверены что хотите удалить?"
@@ -210,8 +228,8 @@ export class SpecialOffersMain extends Component {
                         <Button onClick={this.onCloseUpdate} style={{ marginRight: 8 }}>
                         Отменить
                         </Button>
-                        <Button onClick={this.handleSubmit} type="primary">
-                        Создать
+                        <Button onClick={this.handleUpdate} type="primary">
+                        Изменить
                         </Button>
                     </div>
                 </Drawer>

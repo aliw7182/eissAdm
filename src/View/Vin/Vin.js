@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Table,Button,Divider,Popconfirm}  from 'antd';
 import axios from 'axios';
 
-const url="http://localhost:5000/";
+const url="http://78.40.109.172:5000/";
 
 export class Vin extends Component {
     state={

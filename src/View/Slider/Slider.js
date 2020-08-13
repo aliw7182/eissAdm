@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import Axios from 'axios';
 import { Drawer, Form, Button, Col, Row, Input,Popconfirm, Select,Upload, message, DatePicker, Icon ,Divider,Table} from 'antd';
 
-const url="http://78.40.109.172:5000/";
+const url="http://194.4.58.191:5000/";
 
 export class Slider extends Component {
     state={
         id:"",
         slider_list:[],
-        link_path:[],
         file:"",
         visible:false,
         visibleUpdate:false,
@@ -40,11 +39,10 @@ export class Slider extends Component {
     };
 
     handleSubmit=()=>{
-        var {link_path,file}=this.state;
+        var {file}=this.state;
         console.log(file[0]);
         var data=new FormData();
         data.append('file',file[0]);
-        data.append('link_path',link_path);
         Axios.post(url+"slider",data).then(res=>{
             console.log(res);
             this.refresh();
@@ -53,13 +51,12 @@ export class Slider extends Component {
         }).catch(err=>{console.log(err);message.error('Произошла ошибка!')});
     };
     handleUpdate=()=>{
-        var {link_path_update,file,changed,id}=this.state;
+        var {file,changed,id}=this.state;
         console.log(file[0]);
         var data=new FormData();
         if (changed) {
             data.append('file',file[0]);
         }
-        data.append('link_path',link_path_update);
         data.append('id',id)
         Axios.post(url+"slider/update",data).then(res=>{
             console.log(res);
@@ -87,16 +84,7 @@ export class Slider extends Component {
                 key:"image_path",
                 render: (text, record) => (
                     <span>
-                        <a onClick={()=>{window.open('http://78.40.109.172:5000/'+record.image_path)}}>{text}</a> 
-                    </span>
-                  ),
-            },{
-                title:"Путь куда ведёт кнопка Узнать больше",
-                dataIndex:"link_path",
-                key:"link_path",
-                render: (text, record) => (
-                    <span>
-                        <a onClick={()=>{window.open(record.link_path)}}>{text}</a> 
+                        <a onClick={()=>{window.open('http://194.4.58.191:5000/'+record.image_path)}}>{text}</a> 
                     </span>
                   ),
             },
@@ -105,7 +93,7 @@ export class Slider extends Component {
                 key: 'action',
                 render: (text, record) => (
                   <span>
-                    <a onClick={()=>{this.setState({visibleUpdate:true,link_path_update:record.link_path,image_path_update:record.image_path,id:record.slider_id})}}>Изменить</a>
+                    <a onClick={()=>{this.setState({visibleUpdate:true,image_path_update:record.image_path,id:record.slider_id})}}>Изменить</a>
                     <Divider type="vertical" />
                     <Popconfirm
                             title="Вы уверены что хотите удалить?"
@@ -134,13 +122,6 @@ export class Slider extends Component {
                     visible={this.state.visible}
                     >
                     <Form layout="vertical" hideRequiredMark>
-                        <Row gutter={16}>
-                        <Col span={24}>
-                            <Form.Item label="Путь куда ведёт кнопка <<Узнать Больше>>">
-                                <Input placeholder="url(Просто скопируйте путь как http://example.com/main)" onChange={(e)=>{this.setState({link_path:e.target.value})}} type="text"/>
-                            </Form.Item>
-                        </Col>
-                        </Row>
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Фотография">
@@ -176,13 +157,6 @@ export class Slider extends Component {
                     visible={this.state.visibleUpdate}
                     >
                     <Form layout="vertical" hideRequiredMark>
-                        <Row gutter={16}>
-                        <Col span={24}>
-                            <Form.Item label="Обновить путь куда ведёт кнопка <<Узнать Больше>>">
-                                <Input value={this.state.link_path_update} placeholder="url(Просто скопируйте путь как http://example.com/main)" onChange={(e)=>{this.setState({link_path_update:e.target.value})}} type="text"/>
-                            </Form.Item>
-                        </Col>
-                        </Row>
                         <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item label="Название старой фотографии">

@@ -9,7 +9,7 @@ const { Option } = Select;
 
 
 
-const url="http://78.40.109.172:5000/";
+const url="http://194.4.58.191:5000/";
 
 
 export class SpecialOffersMain extends Component {
@@ -45,7 +45,7 @@ export class SpecialOffersMain extends Component {
     };
 
     refresh=()=>{
-        axios.get(url+'special_offers').then(res=>{this.setState({offer_list:res.data})});
+        axios.get(url+'news').then(res=>{this.setState({offer_list:res.data})});
     }
 
     handleSubmit=()=>{
@@ -55,7 +55,7 @@ export class SpecialOffersMain extends Component {
         data.append('file',file[0]);
         data.append('title',title);
         data.append('text',text);
-        axios.post(url+"special_offers",data).then(res=>{
+        axios.post(url+"news",data).then(res=>{
             console.log(res);
             this.refresh();
             message.success('Успешно добавлено');
@@ -75,7 +75,7 @@ export class SpecialOffersMain extends Component {
         data.append('text',text_update);
         data.append('title',title_update);
         data.append('id',id)
-        Axios.post(url+"special_offers/update",data).then(res=>{
+        Axios.post(url+"news/update",data).then(res=>{
             console.log(res);
             this.refresh();
             message.success('Успешно сделано');
@@ -113,7 +113,7 @@ export class SpecialOffersMain extends Component {
                     <Divider type="vertical" />
                     <Popconfirm
                             title="Вы уверены что хотите удалить?"
-                            onConfirm={()=>{axios.post(url+"special_offers/delete",{info:record}).then(res=>{this.refresh()})}}
+                            onConfirm={()=>{axios.post(url+"news/delete",{info:record}).then(res=>{this.refresh()})}}
                             okText="Да"
                             cancelText="Нет"
                         >
@@ -127,7 +127,7 @@ export class SpecialOffersMain extends Component {
 
         return (
             <div style={{maxWidth:"110%",marginLeft:"30px",marginTop:"40px"}}>
-                <h1 style={{textAlign:'center'}}>Специальные предложения</h1>
+                <h1 style={{textAlign:'center'}}>новости</h1>
                 <Button.Group style={{marginBottom:"20px"}}>
                     <Button onClick={this.refresh} type="primary" >Обновить</Button>
                     <Button onClick={this.showDrawer} type="primary" >Добавить</Button>
@@ -135,7 +135,7 @@ export class SpecialOffersMain extends Component {
                 
                <Table bordered columns={columns} dataSource={this.state.offer_list}/>
                <Drawer
-                    title="Добавить новое специальное предложение"
+                    title="Добавить новость"
                     width={720}
                     onClose={this.onClose}
                     visible={this.state.visible}
@@ -151,7 +151,7 @@ export class SpecialOffersMain extends Component {
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Текст">
-                                <Input.TextArea  onChange={(e)=>{this.setState({text:e.target.value})}}/>
+                                <Input.TextArea rows={12} onChange={(e)=>{this.setState({text:e.target.value})}}/>
                             </Form.Item>
                         </Col>
                         </Row>
@@ -185,7 +185,7 @@ export class SpecialOffersMain extends Component {
                 </Drawer>
 
                 <Drawer
-                    title="Изменить специальное предложение"
+                    title="Изменить новость"
                     width={720}
                     onClose={this.onCloseUpdate}
                     visible={this.state.visibleUpdate}
@@ -201,7 +201,7 @@ export class SpecialOffersMain extends Component {
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Изменить Текст">
-                                <Input.TextArea value={this.state.text_update} onChange={(e)=>{this.setState({text_update:e.target.value})}}/>
+                                <Input.TextArea rows={12} value={this.state.text_update} onChange={(e)=>{this.setState({text_update:e.target.value})}}/>
                             </Form.Item>
                         </Col>
                         </Row>

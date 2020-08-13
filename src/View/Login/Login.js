@@ -20,7 +20,7 @@ export class Login extends Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-                if (values.username==="admin" && values.password==="ura123bus") { 
+                if (values.username==="admin" && values.password==="Eiss2020!") { 
                     console.log(this.props);
                     document.location.reload();
                     localStorage.setItem("hello","expiliarmus");

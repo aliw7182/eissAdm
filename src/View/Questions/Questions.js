@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Table,Button,Divider,Popconfirm,Popover}  from 'antd';
+import {Table,Button,Popconfirm,Popover}  from 'antd';
 import axios from 'axios';
 
 const url="http://194.4.58.191:5000/";

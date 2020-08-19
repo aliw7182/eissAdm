@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Table, Divider, Tag } from 'antd';
-import { Drawer, Form, Button, Col, Row, Input, Select,Upload, message, DatePicker, Icon,Popconfirm } from 'antd';
-import { log } from 'util';
+import { Table, Divider } from 'antd';
+import { Drawer, Form, Button, Col, Row, Input, Select, message, Popconfirm } from 'antd';
 import Axios from 'axios';
 
 const { Option } = Select;

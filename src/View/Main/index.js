@@ -1,21 +1,11 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Button } from 'antd';
+import { Menu, Icon } from 'antd';
 import {Switch,Route,Link,Redirect} from 'react-router-dom';
 import SpecialOffersMain from '../Special_Offers/SpecialOffersMain';
 import Slider from '../Slider/Slider';
 import Questions from '../Questions/Questions';
 import LoginFinal from '../Login/Login';
 import Files from '../Files/Files';
-
-
-const Welcome=()=>{
-    return(
-        <div>
-            <h1>Добро пожаловать</h1>
-            <h3>Здесь вы можете настраивать ваш сайт</h3>
-        </div>
-    )
-}
 
 export class MainOne extends Component {
    

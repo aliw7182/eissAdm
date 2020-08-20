@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
-import { Drawer, Tabs, Form, Button, Col, Row, message, Table } from 'antd';
+import { Drawer, Tabs, Form, Button, Col, Row, message, Table, Popconfirm, Divider } from 'antd';
 import './files.css';
 
-const url = "http://194.4.58.191:5000/";//"http://127.0.0.1:5000/";
+const url = "http://127.0.0.1:5000/";//"http://127.0.0.1:5000/";
 const { TabPane } = Tabs;
 
 export class Files extends Component {
@@ -15,7 +15,8 @@ export class Files extends Component {
         new_file_title: "",
         visible: false,
         visibleUpdate: false,
-        doc_type_id: "1" // 1 = "fiz" | 2 = "юр"
+        doc_type_id: "1", // 1 = "fiz" | 2 = "юр"
+        document_edit: undefined,
     }
 
     componentDidMount() {
@@ -32,7 +33,8 @@ export class Files extends Component {
         this.setState({
             visible: false,
             file: "",
-            new_file_title: ""
+            new_file_title: "",
+            document_edit: undefined,
         });
     };
 
@@ -54,27 +56,59 @@ export class Files extends Component {
 
     handleSubmit() {
         let uploadedFile = "";
-        let document_title = this.state.new_file_title ? this.state.new_file_title : this.state.file[0].name;
-        let document_type_id = this.state.doc_type_id;
-        let document_file_name = this.state.file[0].name;
-        let reader = new FileReader();
         if (this.state.file[0]) {
             uploadedFile = this.state.file[0];
         }
-
-        reader.onload = e => {
-            let base64file = reader.result;
-            let documentData = {
-                document_title,
-                document_type_id,
-                document_file_name,
-                document_binary: base64file,
+        else if(!this.state.document_edit) {
+            message.error("Загрузите файл!");
+            return;
+        }
+        let reader = new FileReader();
+        if (this.state.document_edit) { //При изменении существуещего
+            if (this.state.file[0]) {
+                reader.onload = e => {
+                    let documentData = {
+                        document_title: this.state.new_file_title ? this.state.new_file_title : this.state.file[0].name,
+                        document_type_id: this.state.doc_type_id,
+                        document_file_name: this.state.file[0].name,
+                        document_binary: reader.result,
+                        document_id: this.state.document_edit.id
+                    }
+                    Axios.post(url + "documents", { documentData } ).then(res => {
+                        this.refresh();
+                        message.success('Успешно изменен');
+                        this.setState({ visible: false, new_file_title: "", file: "", document_edit: undefined });
+                    }).catch(err => { console.log(err); message.error('Произошла ошибка!') });
+                }
             }
-            Axios.post(url + "documents", { documentData } ).then(res => {
-                this.refresh();
-                message.success('Успешно добавлено');
-                this.setState({ visible: false, new_file_title: "", file: "" });
-            }).catch(err => { console.log(err); message.error('Произошла ошибка!') });
+            else {
+                let documentData = {
+                    document_title: this.state.new_file_title ? this.state.new_file_title : this.state.document_edit.document_title,
+                    document_type_id: this.state.doc_type_id,
+                    document_file_name: this.state.document_edit.document_file_name,
+                    document_id: this.state.document_edit.id,
+                }
+                Axios.post(url + "documents", { documentData } ).then(res => {
+                    this.refresh();
+                    message.success('Успешно изменен');
+                    this.setState({ visible: false, new_file_title: "", file: "", document_edit: undefined });
+                }).catch(err => { console.log(err); message.error('Произошла ошибка!') });
+            }
+        }
+        else {//При создании нового дока
+            reader.onload = e => {
+                let documentData = {
+                    document_title: this.state.new_file_title ? this.state.new_file_title : this.state.file[0].name,
+                    document_type_id: this.state.doc_type_id,
+                    document_file_name: this.state.file[0].name,
+                    document_binary: reader.result,
+                }
+                Axios.put(url + "documents", { documentData } ).then(res => {
+                    this.refresh();
+                    message.success('Успешно добавлено');
+                    this.setState({ visible: false, new_file_title: "", file: "" });
+                }).catch(err => { console.log(err); message.error('Произошла ошибка!') });
+            }
         }
 
         if (uploadedFile instanceof Blob)
@@ -102,6 +136,10 @@ export class Files extends Component {
         }).catch(err => { console.log(err); message.error('Произошла ошибка!') });
     }
 
+    onDocumentEdit(doc_id) {
+        let foundDoc = this.state.document_list.find((doc) => { return doc.id === doc_id });
+        this.setState({document_edit: foundDoc, visible: true, new_file_title: foundDoc.document_title})
+    }
     /** render methods */
     getDocumentTable() {
         const columns = [
@@ -125,7 +163,17 @@ export class Files extends Component {
                 dataIndex: "id",
                 key: "id",
                 render: (record) => (
-                    <button onClick={this.onDocumentDelete.bind(this, record)}>Удалить файл</button>
+                    <>
+                        <Popconfirm
+                            title="Вы уверены что хотите удалить?"
+                            onConfirm={this.onDocumentDelete.bind(this, record)}
+                            okText="Да"
+                            cancelText="Нет">
+                            <a>Удалить</a>
+                        </Popconfirm>
+                        <Divider type="vertical" />
+                        <a onClick={this.onDocumentEdit.bind(this, record)}>Изменить</a>
+                    </>
                 )
             }
         ]
@@ -134,10 +182,18 @@ export class Files extends Component {
             <>
                 <Table bordered columns={columns} dataSource={this.state.document_list} pagination={false}/>
                 <Drawer title="Добавить новый файл" width={720} onClose={this.onClose.bind(this)} visible={this.state.visible}>
-                    <h3>Название файла (это будет видно клиенту сайта)<input type="text" value={this.state.new_file_title} onChange={this.handleFileTitleChange.bind(this)}></input></h3>
+                    {
+                        this.state.document_edit
+                        ?
+                            <h3>Название файла (это будет видно клиенту сайта)<input type="text" value={this.state.new_file_title} onChange={this.handleFileTitleChange.bind(this)}></input></h3>
+                        : 
+                            <h3>Новое название файла (это будет видно клиенту сайта)<input type="text" value={this.state.new_file_title} onChange={this.handleFileTitleChange.bind(this)}></input></h3>
+                    }
+                    
                     <Form layout="vertical" hideRequiredMark>
                         <Row gutter={16}>
                             <Col span={24}>
+                                { this.state.document_edit ? "Загрузить другой файл" : "" }
                                 <Form.Item label="файл">
                                     <input type="file" onChange={(e) => { this.setState({ file: e.target.files }) }} />
                                 </Form.Item>
@@ -149,7 +205,9 @@ export class Files extends Component {
                             Отменить
                         </Button>
                         <Button onClick={this.handleSubmit.bind(this)} type="primary">
-                            Создать
+                            {
+                                this.state.document_edit ? "Изменить" : "Создать"
+                            }
                         </Button>
                     </div>
                 </Drawer>

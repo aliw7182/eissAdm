@@ -4,6 +4,8 @@ import { Table, Divider, Tag } from 'antd';
 import { Drawer, Form, Button, Col, Row, Input, Select,Upload, message, DatePicker, Icon,Popconfirm } from 'antd';
 import { log } from 'util';
 import Axios from 'axios';
+import { Editor } from '@tinymce/tinymce-react';
+
 
 const { Option } = Select;
 
@@ -25,6 +27,7 @@ export class SpecialOffersMain extends Component {
         text_update:"",
         file_update:""
     };
+    
 
     showDrawer = () => {
         this.setState({
@@ -82,6 +85,12 @@ export class SpecialOffersMain extends Component {
             this.setState({visible:false});
         }).catch(err=>{console.log(err);message.error('Произошла ошибка!')});
     };
+    handleTextEditorChange (content) {
+        this.setState({text:content})
+      }
+    handleTextUpdateEditorChange(content){
+        this.setState({text_update:content})
+      }
     
     render() {
           const columns=[
@@ -144,14 +153,29 @@ export class SpecialOffersMain extends Component {
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Заголовок">
-                                <Input onChange={(e)=>{this.setState({title:e.target.value})}} type="text"/>
+                            <Input onChange={(e)=>{this.setState({title:e.target.value})}} type="text"/>
                             </Form.Item>
                         </Col>
                         </Row>
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Текст">
-                                <Input.TextArea rows={12} onChange={(e)=>{this.setState({text:e.target.value})}}/>
+                            <Editor apiKey="vjtur1dhrumsa5mzoj2rryjwnleo6blz3zpytfkatv4074de"
+                                init={{
+                                    height: 400,
+                                    menubar: false,
+                                plugins: [
+                                        'advlist autolink lists link image charmap print preview anchor',
+                                        'searchreplace visualblocks code fullscreen',
+                                        'insertdatetime media table paste code help wordcount'
+                                         ],
+                                toolbar:
+                                    'undo redo | formatselect | bold italic backcolor | \
+                                    alignleft aligncenter alignright alignjustify | \
+                                    bullist numlist outdent indent | removeformat | help'
+                                                }}
+                            onEditorChange={this.handleTextEditorChange.bind(this)}
+                            />
                             </Form.Item>
                         </Col>
                         </Row>
@@ -194,14 +218,31 @@ export class SpecialOffersMain extends Component {
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Изменить Заголовок">
-                                <Input value={this.state.title_update} onChange={(e)=>{this.setState({title_update:e.target.value})}} type="text"/>
+                            <Input value={this.state.title_update} onChange={(e)=>{this.setState({title_update:e.target.value})}} type="text"/>
+
                             </Form.Item>
                         </Col>
                         </Row>
                         <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item label="Изменить Текст">
-                                <Input.TextArea rows={12} value={this.state.text_update} onChange={(e)=>{this.setState({text_update:e.target.value})}}/>
+                            <Editor apiKey="vjtur1dhrumsa5mzoj2rryjwnleo6blz3zpytfkatv4074de"
+                                initialValue = {this.state.text_update}
+                                init={{
+                                    height: 400,
+                                    menubar: false,
+                                plugins: [
+                                        'advlist autolink lists link image charmap print preview anchor',
+                                        'searchreplace visualblocks code fullscreen',
+                                        'insertdatetime media table paste code help wordcount'
+                                         ],
+                                toolbar:
+                                    'undo redo | formatselect | bold italic backcolor | \
+                                    alignleft aligncenter alignright alignjustify | \
+                                    bullist numlist outdent indent | removeformat | help'
+                                                }}
+                            onEditorChange={this.handleTextUpdateEditorChange.bind(this)}
+                            />                            
                             </Form.Item>
                         </Col>
                         </Row>

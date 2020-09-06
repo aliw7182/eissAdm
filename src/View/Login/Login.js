@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Icon, Input, Button,Typography } from 'antd';
 import './Login.css';
-import {Redirect} from 'react-router-dom';
-import { log } from 'util';
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field]);

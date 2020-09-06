@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
-import { Drawer, Form, Button, Col, Row, Input,Popconfirm, Select,Upload, message, DatePicker, Icon ,Divider,Table} from 'antd';
+import { Drawer, Form, Button, Col, Row,Popconfirm, message, Divider,Table} from 'antd';
 
 const url="http://194.4.58.191:5000/";
 

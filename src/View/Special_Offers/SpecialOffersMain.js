@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Table, Divider } from 'antd';
-import { Drawer, Form, Button, Col, Row, Input, Select, message, Popconfirm } from 'antd';
+import { Drawer, Form, Button, Col, Row, Input, Select, message, Popconfirm, Radio } from 'antd';
 import Axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
 
@@ -10,7 +10,7 @@ const { Option } = Select;
 
 
 
-const url="http://194.4.58.191:5000/";
+const url="http://localhost:5000/";
 
 
 export class SpecialOffersMain extends Component {
@@ -24,7 +24,9 @@ export class SpecialOffersMain extends Component {
         id:"",
         title_update:"",
         text_update:"",
-        file_update:""
+        file_update:"",
+        coverValue: "photo",
+        video_link: ""
     };
     
 
@@ -51,28 +53,66 @@ export class SpecialOffersMain extends Component {
     }
 
     handleSubmit=()=>{
-        var {title,text,file}=this.state;
+        var {title,text,file, video_link}=this.state;
         console.log(file[0]);
-        var data=new FormData();
-        data.append('file',file[0]);
+        let data=new FormData();
+        let video = false;
+        if (file[0]) {
+            data.append('file',file[0]);
+        }
+        else if (video_link) {
+            data.append("video_link", video_link);
+            video = true;
+        }
+        else {
+            message.error('Прикрепите видео или обложку!');
+            return;
+        }
         data.append('title',title);
         data.append('text',text);
-        axios.post(url+"news",data).then(res=>{
-            console.log(res);
-            this.refresh();
-            message.success('Успешно добавлено');
-            this.setState({visible:false});
-        }).catch(err=>{console.log(err);message.error('Произошла ошибка!')})
+        if (video) {
+            axios.post(url+"newsvideo", { 
+                title,
+                text,
+                video_link
+             }).then(res=>{
+                console.log(res);
+                this.refresh();
+                message.success('Успешно добавлено');
+            }).catch(err=>{console.log(err);message.error('Произошла ошибка!'); return;})
+        }
+        else {
+            axios.post(url+"news",data).then(res=>{
+                console.log(res);
+                this.refresh();
+                message.success('Успешно добавлено');
+                
+            }).catch(err=>{console.log(err);message.error('Произошла ошибка!'); return;})
+        }
+        this.setState({
+            visible:false,
+            title: "",
+            text: "",
+            file: "",
+            video_link: ""
+        });
     }
 
     componentWillMount(){
         this.refresh();
     }
     handleUpdate=()=>{
-        var {title_update,text_update,file_update,id}=this.state;
-        var data=new FormData();
+        var {title_update,text_update,file_update,id, video_link}=this.state;
+        let data=new FormData();
         if (file_update[0]) {
             data.append('file',file_update[0]);
+        }
+        else if (video_link) {
+            data.append("video_link", video_link);
+        }
+        else {
+            message.error('Прикрепите видео или обложку!');
+            return;
         }
         data.append('text',text_update);
         data.append('title',title_update);
@@ -86,10 +126,23 @@ export class SpecialOffersMain extends Component {
     };
     handleTextEditorChange (content) {
         this.setState({text:content})
-      }
+    };
+
     handleTextUpdateEditorChange(content){
         this.setState({text_update:content})
-      }
+    };
+
+    onCoverValueChange(event) {
+        this.setState({
+            coverValue: event.target.value,
+        });
+    }
+
+    handlevideo_linkChange(event) {
+        this.setState({
+            video_link: event.target.value,
+        })
+    }
     
     render() {
           const columns=[
@@ -178,12 +231,21 @@ export class SpecialOffersMain extends Component {
                             </Form.Item>
                         </Col>
                         </Row>
-                        <Row gutter={16}>
-                        <Col span={24}>
-                            <Form.Item label="Обложка">
-                                <input type="file" onChange={(e)=>{this.setState({file:e.target.files})}}/>
-                            </Form.Item>
-                        </Col>
+                        <Row gutter={[8, 8]}>
+                            <Radio.Group onChange={this.onCoverValueChange.bind(this)} value={this.state.coverValue}>
+                                <Col span={12}>
+                                    <Radio value={"photo"}>
+                                        Прикрепить картинку
+                                        {this.state.coverValue === "photo" ? <input type="file" onChange={(e)=>{this.setState({file:e.target.files})}}/> : null}
+                                    </Radio>
+                                </Col>
+                                <Col span={12}>
+                                    <Radio value={"video"}>
+                                        Прикрепить видео (YouTube)
+                                        {this.state.coverValue === "video" ? <Input type="url" placeholder="Ссылка на YouTube видео" onChange={this.handlevideo_linkChange.bind(this)}/>  : null}
+                                    </Radio>      
+                                </Col>
+                            </Radio.Group>
                         </Row>
                     </Form>
                     <div
@@ -245,12 +307,37 @@ export class SpecialOffersMain extends Component {
                             </Form.Item>
                         </Col>
                         </Row>
-                        <Row gutter={16}>
-                        <Col span={24}>
-                            <Form.Item label="Прикрепить Новую Обложку">
-                                <input type="file" onChange={(e)=>{this.setState({file_update:e.target.files})}}/>
-                            </Form.Item>
-                        </Col>
+                        <Row gutter={[8, 8]}>
+                            <Radio.Group onChange={this.onCoverValueChange.bind(this)} value={this.state.coverValue}  style={{ padding: 16 }}>
+                                <Col span={12}>
+                                    <Row>
+                                        <Col span={24}>
+                                            <Radio value={"photo"}>
+                                                Прикрепить Новую Обложку
+                                            </Radio>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={24}>
+                                            {this.state.coverValue === "photo" ? <input type="file" onChange={(e)=>{this.setState({file_update:e.target.files})}}/> : null}
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col span={12}>
+                                    <Row>
+                                        <Col span={24}>
+                                            <Radio value={"video"}>
+                                                Прикрепить новое видео
+                                            </Radio>    
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={24}>
+                                            {this.state.coverValue === "video" ? <Input type="url" placeholder="Ссылка на YouTube видео" onChange={this.handlevideo_linkChange.bind(this)}/>  : null}
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Radio.Group>
                         </Row>
                     </Form>
                     <div

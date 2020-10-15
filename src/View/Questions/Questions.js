@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Table,Button,Popconfirm,Popover}  from 'antd';
 import axios from 'axios';
 
-const url="http://194.4.58.191:5000/";
+const url="https://api.eiss.kz/";
 
 export class Questions extends Component {
     state={

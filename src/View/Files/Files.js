@@ -3,7 +3,7 @@ import Axios from 'axios';
 import { Drawer, Tabs, Form, Button, Col, Row, message, Table, Popconfirm, Divider } from 'antd';
 import './files.css';
 
-const url = "http://194.4.58.191:5000/";//"http://127.0.0.1:5000/";
+const url = "https://api.eiss.kz/";//"http://127.0.0.1:5000/";
 const { TabPane } = Tabs;
 
 export class Files extends Component {

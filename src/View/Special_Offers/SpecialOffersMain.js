@@ -11,7 +11,7 @@ const { Option } = Select;
 
 
 
-const url="http://localhost:5000/";
+const url="https://api.eiss.kz/";
 
 
 export class SpecialOffersMain extends Component {

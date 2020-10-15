@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Axios from 'axios';
 import { Drawer, Form, Button, Col, Row,Popconfirm, message, Divider,Table} from 'antd';
 
-const url="http://194.4.58.191:5000/";
+const url="https://api.eiss.kz/";
 
 export class Slider extends Component {
     state={
@@ -84,7 +84,7 @@ export class Slider extends Component {
                 key:"image_path",
                 render: (text, record) => (
                     <span>
-                        <a onClick={()=>{window.open('http://194.4.58.191:5000/'+record.image_path)}}>{text}</a> 
+                        <a onClick={()=>{window.open('https://api.eiss.kz/'+record.image_path)}}>{text}</a> 
                     </span>
                   ),
             },
